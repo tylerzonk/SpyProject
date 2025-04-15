@@ -1,0 +1,22 @@
+version: "3.9"
+services:
+  api:
+    build: ./fastapi_app
+    volumes:
+      - ./cleaned_data:/data
+    networks:
+      - app-net
+
+  streamlit:
+    build: ./streamlit_app
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./cleaned_data:/data
+    depends_on:
+      - api
+    networks:
+      - app-net
+
+networks:
+  app-net:
