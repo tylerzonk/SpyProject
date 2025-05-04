@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  api:
+    build: ./fastapi_app
+    container_name: fastapi_app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./fastapi_app:/app
+      - ./data:/app/data
+      - ./cleaned_data:/app/cleaned_data
+    networks:
+      - spy_net
+
+  streamlit:
+    build: ./streamlitapp
+    container_name: streamlit_app
+    command: streamlit run streamapp.py --server.port=8501 --server.address=0.0.0.0
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./streamlitapp:/app
+      - ./cleaned_data:/app/cleaned_data
+      - ./data:/app/data
+      - ./streamlitapp/model:/app/model
+    networks:
+      - spy_net
+
+networks:
+  spy_net:

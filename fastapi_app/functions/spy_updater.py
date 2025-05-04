@@ -17,6 +17,8 @@ FIVE_MIN_FILE = os.path.join(DATA_DIR, "spy_5min.csv")
 TMP_FILE = "data/spy_1min_newdata.csv"
 CURRENT_TMP_FILE = "data/spy_1min_current.csv"
 CURRENT_DAY_FILE = os.path.join(DATA_DIR, "spy_1min_current_day.csv")
+LAST_1FILE = os.path.join(DATA_DIR, "spy_1min_yesterday.csv")
+LAST_5FILE = os.path.join(DATA_DIR, "spy_5min_yesterday.csv")
 
 
 # === Clean and Format ===
@@ -422,6 +424,39 @@ def create_volatility_features(filepath):
     print(f"Saved volatility features to {output_file} ({len(df_combined)} rows).")
     return df_combined
 
+def create_prior_data():
+    
+    print("Creating prior's data...")
+
+    # Read the source CSV
+    df_1min = pd.read_csv(ONE_MIN_FILE, parse_dates=['timestamp'])
+    df_1min['timestamp'] = pd.to_datetime(df_1min['timestamp'], errors='coerce')
+
+    # Get the most recent date in the data
+    last_date = df_1min['timestamp'].max().date()
+
+    # Filter rows with that date
+    df_last_day = df_1min[df_1min['timestamp'].dt.date == last_date]
+
+    # Save to output file (overwrite)
+    df_last_day.to_csv(LAST_1FILE, index=False)
+
+    # Read the source CSV
+    df_5min = pd.read_csv(FIVE_MIN_FILE, parse_dates=['timestamp'])
+    df_5min['timestamp'] = pd.to_datetime(df_5min['timestamp'], errors='coerce')
+
+    # Get the most recent date in the data
+    last_date = df_5min['timestamp'].max().date()
+
+    # Filter rows with that date
+    df_last_day = df_5min[df_5min['timestamp'].dt.date == last_date]
+
+    # Save to output file (overwrite)
+    df_last_day.to_csv(LAST_5FILE, index=False)
+
+    print(f"Saved data for {last_date} to {LAST_1FILE}")
+    print(f"Saved data for {last_date} to {LAST_5FILE}")
+
 # === MASTER RUNNER ===
 def run_full_sync():
     print("Running SPY full sync...")
@@ -441,11 +476,13 @@ def run_full_sync():
     print("SPY data up-to-date.")
 
     update_daily_summary()
+    create_prior_data()
 
     # Create volume features and save to CSV
     spy_csv_path = os.path.join(DATA_DIR, "spy.csv")
     create_volume_features(spy_csv_path)
     create_volatility_features(spy_csv_path)
+
 
 if __name__ == "__main__":
     run_full_sync()
