@@ -307,6 +307,10 @@ elif page == "Volume":
             # Load current day 1-minute volume data
             current_day_df = pd.read_csv(current_day_one, parse_dates=['timestamp', 'time', 'date'])
             current_day_df = current_day_df.sort_values('timestamp')
+            if current_day_df.empty:
+                current_day_df = pd.read_csv(prior_1, parse_dates=['timestamp', 'time', 'date'])
+                current_day_df = current_day_df[current_day_df['market'] == 1]
+                current_day_df = current_day_df.sort_values('timestamp')
 
             # Filter today's data only
             today = datetime.now().date()
@@ -408,8 +412,13 @@ elif page == "Volatility":
         elif view == "Current Day's Volatility":
             # Load current day 1-minute data
             current_day_df = pd.read_csv(current_day_one, parse_dates=['timestamp', 'time', 'date'])
-            current_day_df = current_day_df.sort_values('timestamp')
 
+            # check to see if the df is empty
+            current_day_df = current_day_df.sort_values('timestamp')
+            if current_day_df.empty:
+                current_day_df = pd.read_csv(prior_1, parse_dates=['timestamp', 'time', 'date'])
+                current_day_df = current_day_df[current_day_df['market'] == 1]
+                current_day_df = current_day_df.sort_values('timestamp')
             # Filter for today's data only
             today = datetime.now().date()
             current_day_df = current_day_df[current_day_df['date'].dt.date == today]
