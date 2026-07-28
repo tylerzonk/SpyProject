@@ -1,3 +1,12 @@
 scratch.ipynb
 example_app/
-fastapi_app\functions\api_key.py
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+**/api_key.py
+
+# Python bytecode
+__pycache__/
+*.py[cod]

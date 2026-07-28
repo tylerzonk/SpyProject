@@ -8,7 +8,7 @@ import yfinance as yf
 from datetime import datetime, timedelta, timezone
 
 # === CONFIG ===
-POLYGON_API_KEY = "e5abVB0UydjFwCnLizrzyiHibeTtkCxD"
+POLYGON_API_KEY = os.environ.get("POLYGON_API_KEY")
 TICKER = "SPY"
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 DATA_DIR = os.path.join(BASE_DIR, "cleaned_data")
@@ -103,6 +103,12 @@ def clean_and_format(file_path):
 
 # === FETCH HISTORICAL DATA FROM POLYGON ===
 def fetch_polygon_data():
+    if not POLYGON_API_KEY:
+        raise RuntimeError(
+            "POLYGON_API_KEY is not set. Export it or add it to a local .env "
+            "file (see .env.example); it is never committed."
+        )
+
     eastern = pytz.timezone("US/Eastern")
     client = RESTClient(POLYGON_API_KEY)
 
